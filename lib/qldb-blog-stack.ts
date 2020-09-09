@@ -5,7 +5,7 @@ Description:
 This DB Stack creates an QLDB ledger. Please note currently CDK only supports raw CFN resource class to 
 create QLDB ledger and QLDB streaming. There is no high-level abstract CDK construct class yet.  
 
-The stack is also creating tables and populate initial data in QLDB via CDK customer resources. 
+The stack is also creating tables and populate initial data in QLDB via a CDK customer resource. 
 
 */
 
@@ -33,7 +33,7 @@ export class QldbBlogStack extends cdk.Stack {
 
         // Create QLDB tables via CDK Custom Resource
         const timeStampString = new Date().toISOString();
-        const customResourceId = 'ProvisionEcpQldbTables';
+        const customResourceId = 'ProvisionQldbTables';
         // As a reference information, any of the value in props field changes here, will trigger Update event on the Custom 
         // Resource
         new CrForProvQldbTables(this, customResourceId, {
