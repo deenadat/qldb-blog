@@ -20,7 +20,7 @@ The steps to deploy this CDK app into your account are listed below. At the high
 
 ## Steps
 
- * `$ npm lib/handler`
+ * `$ cd lib/handler`
  * `$ npm install`
  * `$ npm run publish`
  * `$ cd ../..` 
