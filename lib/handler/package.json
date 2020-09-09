@@ -14,7 +14,7 @@
     "license": "ISC",
     "dependencies": {
         "@types/aws-lambda": "^8.10.53",
-        "amazon-qldb-driver-nodejs": "^1.0.0",
+        "amazon-qldb-driver-nodejs": "^2.0.0",
         "aws-lambda": "^1.0.6",
         "aws-sdk": "^2.605.0",
         "aws-xray-sdk": "^3.0.1",

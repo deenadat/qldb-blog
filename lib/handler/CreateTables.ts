@@ -26,11 +26,16 @@ export async function createQldbTables(
 
     if(tablesToCreate.length > 0)
     {
-        await qldbDriver.executeLambda(async (txn: qldb.TransactionExecutor) => {
-            Promise.all(tablesToCreate.map( (table: string) => {
-                createTable(txn, table);
-            }));
-        }, () => console.log("Retrying due to OCC conflict..."));
+        try {
+            await qldbDriver.executeLambda(async (txn: qldb.TransactionExecutor) => {
+                Promise.all(tablesToCreate.map( (table: string) => {
+                    createTable(txn, table);
+                }));
+            });
+        } catch (e) {
+            console.log(`Unable to create tables: ${e}`);
+        }
+        
     } else {
         console.log('All required tables are existing in QLDB ledger, no more table to be created')
     }
