@@ -6,7 +6,8 @@ test('Empty Stack', () => {
     const app = new cdk.App();
     // WHEN
     const stack = new QldbBlog.QldbBlogStack(app, 'MyTestStack', {
-      qldbLedgerName: "QldbBlog"
+      qldbLedgerName: "QldbBlog", 
+      tableNameList: "VehicleRegistration, Vehicle, Person, DriversLicense"
     });
     // THEN
     expectCDK(stack).to(matchTemplate({

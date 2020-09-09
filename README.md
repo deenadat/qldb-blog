@@ -4,10 +4,16 @@ This is a project of TypeScript development with CDK for setting up QLDB steamin
 
 The `cdk.json` file tells the CDK Toolkit how to execute this app.
 
-The steps to deploy this CDK app into your account are:
+The steps to deploy this CDK app into your account are listed below, which first create the Lambda codes required for the 
+CDK Custom Resource which creating table and populating data in QLDB ledger then compile the CDK codes and deploy into
+target AWS account. 
 
 ## Steps
 
+ * `$ npm lib/handler`
+ * `$ npm install`
+ * `$ npm run publish`
+ * `$ cd ../..` 
  * `$ npm install`   
  * `$ npm run install` 
  * `$ cdk deploy QldbBlogStack`

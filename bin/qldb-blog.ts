@@ -11,8 +11,10 @@ const env = {
     region: process.env.CDK_DEFAULT_REGION,
 };
 const qldbLedgerName = app.node.tryGetContext('qldbLedgerName');
+const tableNameList = app.node.tryGetContext('tableNameList');
 
 new QldbBlogStack(app, 'QldbBlogStack', {
     env,
-    qldbLedgerName
+    qldbLedgerName,
+    tableNameList
 });
