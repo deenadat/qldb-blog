@@ -9,7 +9,7 @@ The steps to deploy this CDK app into your account are listed below. At the high
   1. First compile the codes of the Lambda function required by the CDK Custom Resource which creating table and populating data in QLDB ledger. 
   2. Then compile the codes of the Lambda which replicates the data streamed-out by Kinesis Data Stream to the other QLDB.
   3. Then compile the CDK pack, which includes the following components: 
-    * the QLDB ledger creation supported by CDK aws-qldb module OOTB 
+    ..* the QLDB ledger creation supported by CDK aws-qldb module OOTB 
     * the CDK custom resource which creating tables & populating data in ledger. 
     * Kinesis Data Stream instance. 
     * The QLDB ledger streaming. 
