@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// import { BaseStack } from './base-stack';
 import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
 import { QldbBlogStack } from '../lib/qldb-blog-stack';
