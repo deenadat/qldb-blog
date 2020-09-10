@@ -97,15 +97,34 @@ export class QldbBlogStack extends cdk.Stack {
             encryption: s3.BucketEncryption.KMS
         });
 
+        const firehouseRole = new iam.Role(this, 'firehouseRole', {
+          assumedBy: new iam.ServicePrincipal('firehose.amazonaws.com '),
+        });
+
+        const iamfirePolicyStatement = new iam.PolicyStatement({
+          resources: ['*'],
+          actions: ["kinesis:PutRecord*", "kinesis:DescribeStream",
+          "kinesis:ListShards",
+          "kms:GenerateDataKey",
+          "kinesis:GetRecords",
+          "kinesis:GetShardIterator", "s3:AbortMultipartUpload",
+                "s3:GetBucketLocation",
+                "s3:GetObject",
+                "s3:ListBucket",
+                "s3:ListBucketMultipartUploads",
+                "s3:PutObject"],
+        })
+        firehouseRole.addToPolicy(iamfirePolicyStatement);
+
         const qldbkinesisStream = new kinesisfirehose.CfnDeliveryStream(this, "QldbBlogKinesisFirehouseStream", {
 
           deliveryStreamName: "QldbBlogKinesisFirehouseStream",
           deliveryStreamType: "KinesisStreamAsSource",
           s3DestinationConfiguration: {
             "bucketArn" : bucket.bucketArn,
-            "roleArn" : this.qldbrole.roleArn
+            "roleArn" : firehouseRole.roleArn
           },
-          kinesisStreamSourceConfiguration: {"kinesisStreamArn" : qldbstream.streamArn,"roleArn" : this.qldbrole.roleArn}
+          kinesisStreamSourceConfiguration: {"kinesisStreamArn" : qldbstream.streamArn,"roleArn" : firehouseRole.roleArn}
 
         });
 
