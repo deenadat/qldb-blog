@@ -38,7 +38,7 @@ export class QldbBlogStack extends cdk.Stack {
         // const uid: string = cdk.Construct.node.uniqueId;
         // Create QLDB Ledger
         this.qldbLedger = new qldb.CfnLedger(this, 'QldbBlogLedger', {
-            deletionProtection: true,
+
             name: props.qldbLedgerName,
             permissionsMode: 'ALLOW_ALL',
         });
@@ -98,7 +98,7 @@ export class QldbBlogStack extends cdk.Stack {
         });
 
         const firehouseRole = new iam.Role(this, 'firehouseRole', {
-          assumedBy: new iam.ServicePrincipal('firehose.amazonaws.com '),
+          assumedBy: new iam.ServicePrincipal('firehose.amazonaws.com'),
         });
 
         const iamfirePolicyStatement = new iam.PolicyStatement({
@@ -127,7 +127,7 @@ export class QldbBlogStack extends cdk.Stack {
           kinesisStreamSourceConfiguration: {"kinesisStreamArn" : qldbstream.streamArn,"roleArn" : firehouseRole.roleArn}
 
         });
-
+        qldbkinesisStream.node.addDependency(firehouseRole);
         new cdk.CfnOutput(this, 'QldbLedger', {
             value: this.qldbLedger.ref,
             description: 'Qldb Ledger ID',
