@@ -25,7 +25,7 @@ The steps to deploy this CDK app into your account are listed below. At the high
  * `$ npm run publish`
  * `$ cd ../..` 
  * `$ npm install`   
- * `$ npm run install` 
+ * `$ npm run build` 
  * `$ cdk deploy QldbBlogStack`
 
 
