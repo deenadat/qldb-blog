@@ -1,7 +1,7 @@
 {
-    "name": "handler",
+    "name": "create-qldb-tables",
     "version": "1.0.0",
-    "description": "Lambda of Custom Resource ",
+    "description": "Lambda of Custom Resource CrForProvQldbTables to create QLDB tables",
     "main": "index.js",
     "scripts": {
         "build": "tsc",
