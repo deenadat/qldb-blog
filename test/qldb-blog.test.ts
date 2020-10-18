@@ -7,7 +7,9 @@ test('Empty Stack', () => {
     // WHEN
     const stack = new QldbBlog.QldbBlogStack(app, 'MyTestStack', {
       qldbLedgerName: "QldbBlog", 
-      tableNameList: "VehicleRegistration, Vehicle, Person, DriversLicense"
+      tableNameList: "VehicleRegistration, Vehicle, Person, DriversLicense",
+      kdsKmsAlias: "alias/qldb-streaming/kds-key",
+      s3KmsAlias: "alias/qldb-streaming/s3-key",
     });
     // THEN
     expectCDK(stack).to(matchTemplate({

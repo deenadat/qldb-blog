@@ -20,10 +20,10 @@ The steps to deploy this CDK app into your account are listed below. At the high
 
 ## Steps
 
- * `$ cd lib/handler`
+ * `$ cd lib/lambda/createQldbTables`
  * `$ npm install`
  * `$ npm run publish`
- * `$ cd ../..` 
+ * `$ cd ../../..` 
  * `$ npm install`   
  * `$ npm run build` 
  * `$ cdk deploy QldbBlogStack`

@@ -49,10 +49,10 @@ class QldbTablesProvider extends cdk.Construct {
     constructor(scope: cdk.Construct, id: string) {
         super(scope, id);
 
-        const providerLambdaFn = new lambda.Function(this, 'Handler', {
+        const providerLambdaFn = new lambda.Function(this, 'HandlerLambda', {
             handler: 'index.onEvent',
             runtime: lambda.Runtime.NODEJS_12_X,
-            code: lambda.Code.fromAsset(path.join(__dirname, './handler/output')),
+            code: lambda.Code.fromAsset(path.join(__dirname, './lambda/createQldbTables/output')),
             timeout: cdk.Duration.minutes(5),
             tracing: lambda.Tracing.ACTIVE
         });

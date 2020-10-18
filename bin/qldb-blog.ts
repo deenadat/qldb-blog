@@ -13,9 +13,13 @@ const env = {
 };
 const qldbLedgerName = app.node.tryGetContext('qldbLedgerName');
 const tableNameList = app.node.tryGetContext('tableNameList');
+const kdsKmsAlias = app.node.tryGetContext('kdsKmsAlias');
+const s3KmsAlias = app.node.tryGetContext('s3KmsAlias');
 
 new QldbBlogStack(app, 'QldbBlogStack', {
     env,
     qldbLedgerName,
-    tableNameList
+    tableNameList,
+    kdsKmsAlias,
+    s3KmsAlias
 });
