@@ -23,6 +23,9 @@ The steps to deploy this CDK app into your account are listed below. At the high
  * `$ cd lib/lambda/createQldbTables`
  * `$ npm install`
  * `$ npm run publish`
+ * `$ cd lib/lambda/replayQldbPartiQL`
+ * `$ npm install`
+ * `$ npm run publish`
  * `$ cd ../../..` 
  * `$ npm install`   
  * `$ npm run build` 
