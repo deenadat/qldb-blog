@@ -60,6 +60,10 @@ export class QldbBlogStack extends cdk.Stack {
         });
 
         // Now we create Kinesis Data Stream instance with KMS CMK encryption.
+        //
+        // Kinesis can only guarantee sequence at the Shard only. So we set Shard number to 1 to ensure we can replay the data
+        // into another QLDB in exactly the same sequence. 
+        const shardCount = 1;  
         const kdsKmsKey = new kms.Key(this, 'KmsKeyForKds', {
             alias: props.kdsKmsAlias,
             description: 'KMS key used to encrypt Kinesis Data Stream instance used for QLDB streaming.',
@@ -67,7 +71,7 @@ export class QldbBlogStack extends cdk.Stack {
         });
         const kinesisDataStream = new kinesis.Stream(this, 'KinesisDataStreamForQldbStreaming', {
           streamName: 'qldb-blog-stream',
-          shardCount: 3,
+          shardCount,
           encryption: kinesis.StreamEncryption.KMS,
           encryptionKey: kdsKmsKey
         });
