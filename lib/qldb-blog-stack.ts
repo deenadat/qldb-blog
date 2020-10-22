@@ -17,6 +17,9 @@ import * as kms from "@aws-cdk/aws-kms";
 import * as kinesisfirehose from "@aws-cdk/aws-kinesisfirehose"
 import * as iam from "@aws-cdk/aws-iam"
 import * as s3 from "@aws-cdk/aws-s3"
+import * as lambda from '@aws-cdk/aws-lambda';
+import { KinesisEventSource } from '@aws-cdk/aws-lambda-event-sources';
+import * as path from 'path';
 
 interface QldbBlogStackProps extends cdk.StackProps {
     readonly qldbLedgerName: string;
@@ -57,6 +60,10 @@ export class QldbBlogStack extends cdk.Stack {
         });
 
         // Now we create Kinesis Data Stream instance with KMS CMK encryption.
+        //
+        // Kinesis can only guarantee sequence at the Shard only. So we set Shard number to 1 to ensure we can replay the data
+        // into another QLDB in exactly the same sequence. 
+        const shardCount = 1;  
         const kdsKmsKey = new kms.Key(this, 'KmsKeyForKds', {
             alias: props.kdsKmsAlias,
             description: 'KMS key used to encrypt Kinesis Data Stream instance used for QLDB streaming.',
@@ -64,7 +71,7 @@ export class QldbBlogStack extends cdk.Stack {
         });
         const kinesisDataStream = new kinesis.Stream(this, 'KinesisDataStreamForQldbStreaming', {
           streamName: 'qldb-blog-stream',
-          shardCount: 3,
+          shardCount,
           encryption: kinesis.StreamEncryption.KMS,
           encryptionKey: kdsKmsKey
         });
@@ -75,25 +82,19 @@ export class QldbBlogStack extends cdk.Stack {
           assumedBy: new iam.ServicePrincipal('qldb.amazonaws.com'),
           description: 'Role used by QLDB to stream data into Kinesis Data Stream instance'
         });
-        kdsKmsKey.grantEncryptDecrypt(this.qldbrole);
         kinesisDataStream.grantWrite(this.qldbrole);
         kinesisDataStream.grantRead(this.qldbrole)
         kinesisDataStream.grant(this.qldbrole, 'kinesis:DescribeStream');
         
-        /*
-        const iamPolicyStatement = new iam.PolicyStatement({
-          resources: ['*'],
-          actions: ['kinesis:PutRecord*', 'kinesis:DescribeStream', 'kinesis:ListShards','kms:GenerateDataKey'],
-        })
-        this.qldbrole.addToPolicy(iamPolicyStatement);
-        */
  
         // Now we set up QLDB Streaming linked with KDS instance created above via the IAM role. 
-        const dateTime = new Date()
+        // Sets the QLDB stream includesive start time to be at 2020-01-01 to ensure all the data in QLDB
+        // will be streamed out. 
+        const dateTime = new Date('2020-01-01');
         this.qldbLedgerStream = new qldb.CfnStream(this, 'QldbBlogLedgerStream', {
             streamName: "QldbBlogLedgerStream",
             ledgerName: props.qldbLedgerName,
-            kinesisConfiguration: {streamArn : kinesisDataStream.streamArn, aggregationEnabled: true},
+            kinesisConfiguration: {streamArn : kinesisDataStream.streamArn, aggregationEnabled: false},
             inclusiveStartTime: dateTime.toISOString(),
             roleArn: this.qldbrole.roleArn
         });
@@ -118,28 +119,10 @@ export class QldbBlogStack extends cdk.Stack {
           assumedBy: new iam.ServicePrincipal('firehose.amazonaws.com'),
           description: 'Role used by Kinesis Firehose to read QLDB streaming from KDS instance and store into S3 bucket.'
         });
-        kdsKmsKey.grantEncryptDecrypt(firehoseRole);
+        //kdsKmsKey.grantEncryptDecrypt(firehoseRole);
         kinesisDataStream.grantRead(firehoseRole);
         kinesisDataStream.grant(firehoseRole, 'kinesis:DescribeStream');
         bucket.grantReadWrite(firehoseRole);
-
-
-        /*
-        const iamfirePolicyStatement = new iam.PolicyStatement({
-          resources: ['*'],
-          actions: ["kinesis:PutRecord*", "kinesis:DescribeStream",
-          "kinesis:ListShards",
-          "kms:GenerateDataKey",
-          "kinesis:GetRecords",
-          "kinesis:GetShardIterator", "s3:AbortMultipartUpload",
-                "s3:GetBucketLocation",
-                "s3:GetObject",
-                "s3:ListBucket",
-                "s3:ListBucketMultipartUploads",
-                "s3:PutObject"],
-        })
-        firehoseRole.addToPolicy(iamfirePolicyStatement);
-        */
 
         // Now we create the Kinesis Firehose instance to read QLDB streaming data from the Kinesis Data Stream instance, then
         // store them into the S3 bucket. 
@@ -156,6 +139,21 @@ export class QldbBlogStack extends cdk.Stack {
             },
         });
         kinesisFirehoseDeliveryStream.node.addDependency(firehoseRole);
+
+        // Create Lambda receives streaming message from Kinesis Data Stream and then replay the PartiQL against another QLDB
+        // instance to replicate the data. 
+        const replayPartiQLLambdaFn = new lambda.Function(this, 'ReplayPartiQLLambda', {
+            handler: 'index.onEvent',
+            runtime: lambda.Runtime.NODEJS_12_X,
+            code: lambda.Code.fromAsset(path.join(__dirname, './lambda/replayQldbPartiQL/output')),
+            timeout: cdk.Duration.minutes(5),
+            tracing: lambda.Tracing.ACTIVE
+        });
+
+        replayPartiQLLambdaFn.addEventSource(new KinesisEventSource(kinesisDataStream, {
+            batchSize: 100, // default
+            startingPosition: lambda.StartingPosition.TRIM_HORIZON
+        }));
 
         // Create CloudFormation output. 
         new cdk.CfnOutput(this, 'QldbLedger', {
