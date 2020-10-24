@@ -1,11 +1,11 @@
 import { expect as expectCDK, matchTemplate, MatchStyle } from '@aws-cdk/assert';
 import * as cdk from '@aws-cdk/core';
-import * as QldbBlog from '../lib/qldb-blog-stack';
+import * as QldbBlog from '../lib/qldb-blog-stream-stack';
 
 test('Empty Stack', () => {
     const app = new cdk.App();
     // WHEN
-    const stack = new QldbBlog.QldbBlogStack(app, 'MyTestStack', {
+    const stack = new QldbBlog.QldbBlogStreamStack(app, 'MyTestStack', {
       qldbLedgerName: "QldbBlog", 
       backupQldbLedgerName: "QldbBlogBackup",
       tableNameList: "VehicleRegistration, Vehicle, Person, DriversLicense",
