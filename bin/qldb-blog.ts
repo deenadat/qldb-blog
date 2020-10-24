@@ -12,6 +12,7 @@ const env = {
     region: process.env.CDK_DEFAULT_REGION,
 };
 const qldbLedgerName = app.node.tryGetContext('qldbLedgerName');
+const backupQldbLedgerName = app.node.tryGetContext('backupQldbLedgerName');
 const tableNameList = app.node.tryGetContext('tableNameList');
 const kdsKmsAlias = app.node.tryGetContext('kdsKmsAlias');
 const s3KmsAlias = app.node.tryGetContext('s3KmsAlias');
@@ -19,6 +20,7 @@ const s3KmsAlias = app.node.tryGetContext('s3KmsAlias');
 new QldbBlogStack(app, 'QldbBlogStack', {
     env,
     qldbLedgerName,
+    backupQldbLedgerName,
     tableNameList,
     kdsKmsAlias,
     s3KmsAlias

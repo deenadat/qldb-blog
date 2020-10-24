@@ -10,3 +10,6 @@ cdk.out
 
 # Parcel default cache directory
 .parcel-cache
+
+# Ignore *.js.LICENSE.txt
+*.js.LICENSE.txt
