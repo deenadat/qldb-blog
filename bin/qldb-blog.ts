@@ -13,23 +13,23 @@ const env = {
     region: process.env.CDK_DEFAULT_REGION,
 };
 const qldbLedgerName = app.node.tryGetContext('qldbLedgerName');
-const backupQldbLedgerName = app.node.tryGetContext('backupQldbLedgerName');
+const destQldbLedgerName = app.node.tryGetContext('destQldbLedgerName');
 const tableNameList = app.node.tryGetContext('tableNameList');
 const kdsKmsAlias = app.node.tryGetContext('kdsKmsAlias');
 const s3KmsAlias = app.node.tryGetContext('s3KmsAlias');
 
-// First we use QldbBlogDbStack to create both source and backup QLDB Ledgers.
+// First we use QldbBlogDbStack to create both source and destination QLDB Ledgers.
 const qldbBlogDbStack = new QldbBlogDbStack(app, 'QldbBlogDbStack', {
     env,
     qldbLedgerName,
-    backupQldbLedgerName,
+    destQldbLedgerName,
 });
 
-// Now we use QldbBlogStreamStack to deploy the stream settings & PartiQL replay Lambda in between the source & backup QLDB ledgers.
+// Now we use QldbBlogStreamStack to deploy the stream settings & PartiQL replay Lambda in between the source & destination QLDB ledgers.
 new QldbBlogStreamStack(app, 'QldbBlogStreamStack', {
     env,
     qldbLedgerName: qldbBlogDbStack.qldbLedger.name!,
-    backupQldbLedgerName: qldbBlogDbStack.qldbLedgerBakcup.name!,
+    destQldbLedgerName: qldbBlogDbStack.qldbLedgerStreaming.name!,
     tableNameList,
     kdsKmsAlias,
     s3KmsAlias

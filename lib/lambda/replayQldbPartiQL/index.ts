@@ -14,13 +14,13 @@ export async function onEvent(
     console.log(`Processing request: `, event);
 
     const aws_region = process.env.AWS_REGION;
-    const backQdlbName = process.env.backupQldbName;
+    const destQdlbName = process.env.destQldbName;
 
     const qldbClientConfigOptions = {
         region: aws_region,
     };
 
-    const qldbDriver = new qldb.QldbDriver(backQdlbName!, qldbClientConfigOptions);
+    const qldbDriver = new qldb.QldbDriver(destQdlbName!, qldbClientConfigOptions);
 
     try {
         for (const record of event.Records) {

@@ -4,7 +4,7 @@ Description:
 
 This CDK Stack creates two QLDB ledgers:
     i. QldbBlog
-    ii. QldbBlogBackup
+    ii. QldbBlogStreaming
     
 Please note currently CDK only supports raw CFN resource class to create QLDB ledger. There is no high-level abstract CDK construct class yet.
 
@@ -18,12 +18,12 @@ import * as qldb from '@aws-cdk/aws-qldb';
 
 interface QldbBlogDbStackProps extends cdk.StackProps {
     readonly qldbLedgerName: string;
-    readonly backupQldbLedgerName: string;
+    readonly destQldbLedgerName: string;
 }
 
 export class QldbBlogDbStack extends cdk.Stack {
     public readonly qldbLedger: qldb.CfnLedger;
-    public readonly qldbLedgerBakcup: qldb.CfnLedger;
+    public readonly qldbLedgerStreaming: qldb.CfnLedger;
 
     constructor(scope: cdk.Construct, id: string, props: QldbBlogDbStackProps) {
 
@@ -35,9 +35,9 @@ export class QldbBlogDbStack extends cdk.Stack {
             permissionsMode: 'ALLOW_ALL',
         });
 
-        // Create the backup QLDB instance. 
-        this.qldbLedgerBakcup = new qldb.CfnLedger(this, 'QldbBlogLedgerBackup', {
-            name: props.backupQldbLedgerName,
+        // Create the destination QLDB instance. 
+        this.qldbLedgerStreaming = new qldb.CfnLedger(this, 'QldbBlogLedgerStreaming', {
+            name: props.destQldbLedgerName,
             permissionsMode: 'ALLOW_ALL',
         });
 
@@ -47,9 +47,9 @@ export class QldbBlogDbStack extends cdk.Stack {
             description: 'Qldb Ledger ID',
         });
 
-        new cdk.CfnOutput(this, 'QldbLedgerBackupId', {
-            value: this.qldbLedgerBakcup.ref,
-            description: 'Backup Qldb Ledger ID',
+        new cdk.CfnOutput(this, 'QldbLedgerStreamingId', {
+            value: this.qldbLedgerStreaming.ref,
+            description: 'Destination Qldb Ledger ID',
         });
 
     };

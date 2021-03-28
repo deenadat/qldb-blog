@@ -5,7 +5,7 @@
     "aws-cdk:enableDiffNoFail": "true",
     "@aws-cdk/core:stackRelativeExports": "true",
     "qldbLedgerName": "QldbBlog",
-    "backupQldbLedgerName": "QldbBlogBackup",
+    "destQldbLedgerName": "QldbBlogStreaming",
     "tableNameList": "VehicleRegistration, Vehicle, Person, DriversLicense",
     "kdsKmsAlias": "alias/qldb-streaming/kds-key",
     "s3KmsAlias": "alias/qldb-streaming/s3-key"

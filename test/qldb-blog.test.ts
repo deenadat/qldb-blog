@@ -7,7 +7,7 @@ test('Empty Stack', () => {
     // WHEN
     const stack = new QldbBlog.QldbBlogStreamStack(app, 'MyTestStack', {
       qldbLedgerName: "QldbBlog", 
-      backupQldbLedgerName: "QldbBlogBackup",
+      destQldbLedgerName: "QldbBlogStreaming",
       tableNameList: "VehicleRegistration, Vehicle, Person, DriversLicense",
       kdsKmsAlias: "alias/qldb-streaming/kds-key",
       s3KmsAlias: "alias/qldb-streaming/s3-key",

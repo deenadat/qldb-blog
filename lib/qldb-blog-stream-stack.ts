@@ -24,7 +24,7 @@ import { create } from 'domain';
 
 interface QldbBlogStreamStackProps extends cdk.StackProps {
     readonly qldbLedgerName: string;
-    readonly backupQldbLedgerName: string;
+    readonly destQldbLedgerName: string;
     readonly tableNameList: string;
     readonly kdsKmsAlias: string;
     readonly s3KmsAlias: string;
@@ -122,9 +122,9 @@ export class QldbBlogStreamStack extends cdk.Stack {
 
 
         // Now we create Lambda which receives streaming message from Kinesis Data Stream and then replay the PartiQL against 
-        // the backup QLDB ledger to achieve the goal of automatic data replication. 
+        // the destination QLDB ledger to achieve the goal of automatic data replication. 
         const envVariableList = {
-            backupQldbName: props.backupQldbLedgerName,
+            destQldbName: props.destQldbLedgerName,
         };
 
         const replayPartiQLLambdaFn = new lambda.Function(this, 'ReplayPartiQLLambda', {
@@ -136,14 +136,14 @@ export class QldbBlogStreamStack extends cdk.Stack {
             environment: envVariableList,
         });
 
-        // Assign QLDB permssion to PartiQL statement replay Lambda so it can execute the PartiQL statements against backup QLDB instance.
+        // Assign QLDB permssion to PartiQL statement replay Lambda so it can execute the PartiQL statements against destination QLDB instance.
         const lambdaFnPolicyStmQldb = new iam.PolicyStatement();
         lambdaFnPolicyStmQldb.addActions(
             'qldb:SendCommand',
         );
         const stack = cdk.Stack.of(this);
-        const backupQldbLedgerArn = `arn:${stack.partition}:qldb:${stack.region}:${stack.account}:ledger/${props.backupQldbLedgerName}`;
-        lambdaFnPolicyStmQldb.addResources(backupQldbLedgerArn);
+        const destQldbLedgerArn = `arn:${stack.partition}:qldb:${stack.region}:${stack.account}:ledger/${props.destQldbLedgerName}`;
+        lambdaFnPolicyStmQldb.addResources(destQldbLedgerArn);
         replayPartiQLLambdaFn.addToRolePolicy(lambdaFnPolicyStmQldb);
 
         // Add Kenisis Data Stream trigger to the replay Labmda. 
@@ -158,10 +158,10 @@ export class QldbBlogStreamStack extends cdk.Stack {
         //     Person
         //     DriversLicense
         //
-        // Then the PartiQL replay Lambda created above will automatically repeat the same to the backup QLDB ledger of QldbBlogBackup.
+        // Then the PartiQL replay Lambda created above will automatically repeat the same to the destination QLDB ledger of QldbBlogStreaming.
         // 
-        // After all the deployment done, the PartiQL replay Lambda will continuously replay any PartiQL statements against backup QDLB
-        // ledger to keep the source and backup ledgers in sync. 
+        // After all the deployment done, the PartiQL replay Lambda will continuously replay any PartiQL statements against destination QDLB
+        // ledger to keep the source and destination ledgers in sync. 
         const timeStampString = new Date().toISOString();
         const customResourceId = 'ProvisionQldbTables';
         const crForProvQldbTables = new CrForProvQldbTables(this, customResourceId, {
